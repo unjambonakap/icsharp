@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{A785BBFB-CD6C-48B7-8BEA-DC241ACB6D70}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>iCSharp.Kernel</RootNamespace>
     <AssemblyName>iCSharp.Kernel</AssemblyName>
@@ -62,7 +62,6 @@
     <Compile Include="Heartbeat\Heartbeat.cs" />
     <Compile Include="IServer.cs" />
     <Compile Include="KernelCreator.cs" />
-    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReplEngineFactory.cs" />
     <Compile Include="ScriptEngine\ExecutionResult.cs" />
