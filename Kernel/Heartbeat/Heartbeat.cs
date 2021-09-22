@@ -6,6 +6,9 @@ namespace iCSharp.Kernel.Heartbeat
 {
     using NetMQ;
     using NetMQ.Sockets;
+    using System;
+    using System.Collections.Generic;
+    using System.Net.Sockets;
     using System.Threading;
 
     public class Heartbeat : IServer
@@ -21,6 +24,8 @@ namespace iCSharp.Kernel.Heartbeat
 
         private bool disposed;
 
+        public Dictionary<string, int> PortMapping { get; } = new Dictionary<string, int>();
+
         public Heartbeat(ILog logger,  string address)
         {
             this.logger = logger;
@@ -32,9 +37,16 @@ namespace iCSharp.Kernel.Heartbeat
 
         public void Start()
         {
+            this.server.Bind(this.address);
             this.thread = new Thread(this.StartServerLoop);
             this.thread.Start();
             //ThreadPool.QueueUserWorkItem(new WaitCallback(StartServerLoop));
+        }
+        public void StartRandomPort()
+        {
+            PortMapping["hb"] = this.server.BindRandomPort(this.address);
+            this.thread = new Thread(this.StartServerLoop);
+            this.thread.Start();
         }
 
         public void Stop()
@@ -49,16 +61,21 @@ namespace iCSharp.Kernel.Heartbeat
 
         private void StartServerLoop(object state)
         {
-            this.server.Bind(this.address);
 
-            while (!this.stopEvent.Wait(0))
+            try
             {
-                byte[] data = this.server.ReceiveFrameBytes();
 
-                this.logger.Info(System.Text.Encoding.Default.GetString(data));
-                // Echoing back whatever was received
-                this.server.TrySendFrame(data);
+                while (!this.stopEvent.Wait(0))
+                {
+                    byte[] data = this.server.ReceiveFrameBytes();
+
+                    this.logger.Info(System.Text.Encoding.Default.GetString(data));
+                    // Echoing back whatever was received
+                    this.server.TrySendFrame(data);
+                }
             }
+            catch (SocketException s) { }
+            catch (ObjectDisposedException e) { }
 
         }
 
@@ -69,6 +86,7 @@ namespace iCSharp.Kernel.Heartbeat
 
         protected void Dispose(bool dispose)
         {
+            this.Stop();
             if (!this.disposed)
             {
                 if (dispose)
@@ -82,5 +100,6 @@ namespace iCSharp.Kernel.Heartbeat
                 }
             }
         }
+
     }
 }

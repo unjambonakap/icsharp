@@ -43,7 +43,9 @@ namespace iCSharp.Kernel.ScriptEngine
 
         public override void WriteLine(object value)
         {
-            this.SendOutputMessageToIOPub(value.ToString());
+            if (value == null)
+                this.SendOutputMessageToIOPub("");
+            else this.SendOutputMessageToIOPub(value.ToString());
 #if DEBUG
             _originalConsoleOut.WriteLine(value);
 #endif
@@ -82,10 +84,11 @@ namespace iCSharp.Kernel.ScriptEngine
 
         private void SendOutputMessageToIOPub(string value)
         {
+            value = value ?? "null";
             JObject data = new JObject()
             {
-                {"text/plain", value},
-                {"text/html",  HttpUtility.HtmlEncode(value)}
+                {"text/plain", value },
+                {"text/html",  HttpUtility.HtmlEncode(value).Replace("\n", "<br/>")}
             };
 
             DisplayData displayData = new DisplayData()

@@ -5,16 +5,19 @@ using System.Threading;
 namespace iCSharp.Kernel.Control
 {
     using System;
+    using System.Collections.Generic;
     using NetMQ;
     using NetMQ.Sockets;
 
-	public class Control : IServer
+    public class Control : IServer
     {
         private int port;
 
         private RouterSocket server;
 
         private bool disposed;
+
+        public Dictionary<string, int> PortMapping => throw new NotImplementedException();
 
         public Control(int port)
         {
@@ -56,6 +59,12 @@ namespace iCSharp.Kernel.Control
                     this.disposed = true;
                 }
             }
+        }
+
+        public void StartRandomPort()
+        {
+            throw new NotImplementedException();
+
         }
     }
 }

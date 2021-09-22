@@ -10,17 +10,24 @@ namespace iCSharp.Kernel.Shell
     using iCSharp.Kernel.Helpers;
     using iCSharp.Messages;
     using NetMQ;
-	using NetMQ.Sockets;
+    using NetMQ.Sockets;
     using Newtonsoft.Json.Linq;
+    using AsyncIO;
+
+    using System;
+    using System.Net.Sockets;
 
     public class Shell : IServer
     {
+        public Dictionary<string, int> PortMapping { get; } = new Dictionary<string, int>();
+
         private ILog logger;
         private string addressShell;
         private string addressIOPub;
 
         private ISignatureValidator signatureValidator;
         private RouterSocket server;
+        private RouterSocket serverControl;
         private PublisherSocket ioPubSocket;
 
         private ManualResetEventSlim stopEvent;
@@ -29,6 +36,8 @@ namespace iCSharp.Kernel.Shell
         private bool disposed;
 
         private Dictionary<string, IShellMessageHandler> messageHandlers;
+        private Thread threadControl;
+        private AsyncIO.AsyncSocket dummy;
 
         public Shell(ILog logger,
                      string addressShell,
@@ -43,12 +52,29 @@ namespace iCSharp.Kernel.Shell
             this.messageHandlers = messageHandlers;
 
             this.server = new RouterSocket();
+            this.serverControl = new RouterSocket();
             this.ioPubSocket = new PublisherSocket();
             this.stopEvent = new ManualResetEventSlim();
+            dummy = AsyncSocket.CreateIPv4Tcp();
         }
 
+        public void StartRandomPort()
+        {
+            PortMapping["shell"] = this.server.BindRandomPort(this.addressShell);
+            PortMapping["iopub"] = this.ioPubSocket.BindRandomPort(this.addressIOPub);
+            PortMapping["control"] = this.serverControl.BindRandomPort(this.addressShell);
+            this.thread = new Thread(this.StartServerLoop);
+            this.thread.Start();
+
+            this.threadControl = new Thread(this.StartServerLoopControl);
+            this.threadControl.Start();
+            this.logger.Info($"Shell Started {dummy.GetHashCode()}");
+            //ThreadPool.QueueUserWorkItem(new WaitCallback(StartServerLoop));
+        }
         public void Start()
         {
+            this.server.Bind(this.addressShell);
+            this.ioPubSocket.Bind(this.addressIOPub);
             this.thread = new Thread(this.StartServerLoop);
             this.thread.Start();
 
@@ -56,33 +82,48 @@ namespace iCSharp.Kernel.Shell
             //ThreadPool.QueueUserWorkItem(new WaitCallback(StartServerLoop));
         }
 
-        private void StartServerLoop(object state)
+        private void StartServerLoopControl(object state)
         {
-            this.server.Bind(this.addressShell);
-            this.logger.Info(string.Format("Binded the Shell server to address {0}", this.addressShell));
-
-            this.ioPubSocket.Bind(this.addressIOPub);
-            this.logger.Info(string.Format("Binded the  IOPub to address {0}", this.addressIOPub));
-
+            return;
             while (!this.stopEvent.Wait(0))
             {
                 Message message = this.GetMessage();
 
-                this.logger.Info(JsonSerializer.Serialize(message));
+                this.logger.Warn("Control message >> >> " + JsonSerializer.Serialize(message));
 
-                IShellMessageHandler handler;
-                if (this.messageHandlers.TryGetValue(message.Header.MessageType, out handler))
+            }
+        }
+
+        private void StartServerLoop(object state)
+        {
+            this.logger.Info(string.Format("Binded the Shell server to address {0}", this.addressShell));
+
+            this.logger.Info(string.Format("Binded the  IOPub to address {0}", this.addressIOPub));
+
+            try
+            {
+                while (!this.stopEvent.Wait(0))
                 {
-                    this.logger.Info(string.Format("Sending message to handler {0}", message.Header.MessageType));
-                    handler.HandleMessage(message, this.server, this.ioPubSocket);
-                    this.logger.Info("Message handling complete");
-                }
-                else
-                {
-                    this.logger.Error(string.Format("No message handler found for message type {0}",
-                                                    message.Header.MessageType));
+                    Message message = this.GetMessage();
+                    if (message == null) return;
+
+                    this.logger.Info(JsonSerializer.Serialize(message));
+
+                    IShellMessageHandler handler;
+                    if (this.messageHandlers.TryGetValue(message.Header.MessageType, out handler))
+                    {
+                        this.logger.Info(string.Format("Sending message to handler {0}", message.Header.MessageType));
+                        handler.HandleMessage(message, this.server, this.ioPubSocket);
+                        this.logger.Info("Message handling complete");
+                    }
+                    else
+                    {
+                        this.logger.Error(string.Format("No message handler found for message type {0}",
+                                                        message.Header.MessageType));
+                    }
                 }
             }
+            catch (SocketException s) { }
         }
 
         private Message GetMessage()
@@ -94,8 +135,13 @@ namespace iCSharp.Kernel.Shell
             // http://ipython.org/ipython-doc/dev/development/messaging.html#the-wire-protocol
             byte[] delimAsBytes = Encoding.ASCII.GetBytes(Constants.DELIMITER);
             byte[] delim;
-            while (true) {
-                delim = this.server.ReceiveFrameBytes();
+            while (true)
+            {
+                if (!this.server.TryReceiveFrameBytes(TimeSpan.FromSeconds(1), out delim))
+                {
+                    if (this.stopEvent.IsSet) return null;
+                    continue;
+                }
                 if (delim.SequenceEqual(delimAsBytes)) break;
 
                 message.Identifiers.Add(delim);
@@ -149,11 +195,12 @@ namespace iCSharp.Kernel.Shell
 
         protected void Dispose(bool dispose)
         {
-            if(!this.disposed)
+            this.Stop();
+            if (!this.disposed)
             {
-                if(dispose)
+                if (dispose)
                 {
-                    if(this.server != null)
+                    if (this.server != null)
                     {
                         this.server.Dispose();
                     }

@@ -32,5 +32,8 @@ namespace iCSharp.Messages
 
         [JsonProperty("iopub_port")]
         public int IOPubPort { get; set; }
+
+        [JsonProperty("name")]
+        public string Name { get; set; }
     }
 }

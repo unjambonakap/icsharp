@@ -2,6 +2,7 @@
 namespace iCSharp.Kernel
 {
     using System.Collections.Generic;
+    using System.Reflection;
     using Common.Logging;
     using Common.Logging.Simple;
     using iCSharp.Kernel.Helpers;
@@ -9,7 +10,6 @@ namespace iCSharp.Kernel
 	using iCSharp.Kernel.Shell;
 	using iCSharp.Messages;
 	using NetMQ;
-
 
     public class KernelCreator
     {
@@ -32,18 +32,20 @@ namespace iCSharp.Kernel
         private Dictionary<string, IShellMessageHandler> _messageHandlerMap; 
 
 
-        public KernelCreator(ConnectionInformation connectionInformation)
+        public KernelCreator(ConnectionInformation connectionInformation,
+            ScriptCs.Contracts.ExtraParams extraParams
+            )
         {
 
-        #if DEBUG
-            this._logger = new ConsoleOutLogger("kernel", LogLevel.All, true, true, false, "yyyy/MM/dd HH:mm:ss:fff");
-        #else
             this._logger = new NoOpLogger();
-        #endif
+           // this._logger = new ConsoleOutLogger("kernel", LogLevel.Info, true, true, false, "yyyy/MM/dd HH:mm:ss:fff");
 
             this._connectionInformation = connectionInformation;
-            this._replEngineFactory = new ReplEngineFactory(this._logger, new string[] {});
+            //this._replEngineFactory = new ReplEngineFactory(this._logger, new string[] {"-loglevel", "DEBUG"});
+   
+            this._replEngineFactory = new ReplEngineFactory(this._logger, new string[] {}, extraParams);
         }
+
 
 		public ISignatureValidator SignatureValidator
 		{
@@ -189,6 +191,7 @@ namespace iCSharp.Kernel
 
         private string GetAddress(int port)
         {
+            if (port == 0) return $"{_connectionInformation.Transport}://{_connectionInformation.IP}";
             string address = string.Format("{0}://{1}:{2}", this._connectionInformation.Transport,
                         this._connectionInformation.IP, port);
 

@@ -12,10 +12,11 @@ namespace iCSharp.Kernel.ScriptEngine
         private readonly Repl repl;
         private readonly MemoryBufferConsole console;
 
-        public ReplEngineWrapper(ILog logger, Repl repl, MemoryBufferConsole console)
+        public ReplEngineWrapper(ILog logger, Repl repl, MemoryBufferConsole console, ExtraParams extraParams)
         {
             this.logger = logger;
             this.repl = repl;
+            repl.ExtraParams = extraParams;
             this.console = console;
         }
 

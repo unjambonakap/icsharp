@@ -22,12 +22,14 @@ namespace iCSharp.Kernel
         private IReplEngine _replEngine;
         private Repl _repl;
         private MemoryBufferConsole _console;
+        private ExtraParams _extraParams;
         private ILog _logger;
 
-        public ReplEngineFactory(ILog logger, string[] args)
+        public ReplEngineFactory(ILog logger, string[] args, ExtraParams extraParams)
         {
             this._logger = logger;
             this.args = args;
+            _extraParams = extraParams;
         }
 
         public IReplEngine ReplEngine
@@ -36,7 +38,7 @@ namespace iCSharp.Kernel
             {
                 if (this._replEngine == null)
                 {
-                    this._replEngine = new ReplEngineWrapper(this.Logger, this.Repl, this.Console);
+                    this._replEngine = new ReplEngineWrapper(this.Logger, this.Repl, this.Console, this._extraParams);
                 }
 
                 return this._replEngine;
@@ -120,10 +122,10 @@ namespace iCSharp.Kernel
             if (profileOptimizationType != null)
             {
                 var setProfileRoot = profileOptimizationType.GetMethod("SetProfileRoot", BindingFlags.Public | BindingFlags.Static);
-                setProfileRoot.Invoke(null, new object[] { typeof(Program).Assembly.Location });
+                setProfileRoot.Invoke(null, new object[] { typeof(ReplEngineFactory).Assembly.Location });
 
                 var startProfile = profileOptimizationType.GetMethod("StartProfile", BindingFlags.Public | BindingFlags.Static);
-                startProfile.Invoke(null, new object[] { typeof(Program).Assembly.GetName().Name + ".profile" });
+                startProfile.Invoke(null, new object[] { typeof(ReplEngineFactory).Assembly.GetName().Name + ".profile" });
             }
         }
     }

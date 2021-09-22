@@ -1,4 +1,5 @@
 ﻿
+
 namespace iCSharp.Kernel.ScriptEngine
 {
     public interface IReplEngine
