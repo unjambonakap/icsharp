@@ -30,6 +30,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScriptCs.Engine.Mono", "Eng
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScriptCs.Hosting", "Engine\src\ScriptCs.Hosting\ScriptCs.Hosting.csproj", "{9AEF2D95-87FB-4829-B384-34BFE076D531}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{0282BE3C-4590-44E4-870D-DED42010697E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -72,6 +74,10 @@ Global
 		{9AEF2D95-87FB-4829-B384-34BFE076D531}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9AEF2D95-87FB-4829-B384-34BFE076D531}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9AEF2D95-87FB-4829-B384-34BFE076D531}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0282BE3C-4590-44E4-870D-DED42010697E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0282BE3C-4590-44E4-870D-DED42010697E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0282BE3C-4590-44E4-870D-DED42010697E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0282BE3C-4590-44E4-870D-DED42010697E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -12,7 +12,6 @@ namespace iCSharp.Kernel.Shell
     using NetMQ;
     using NetMQ.Sockets;
     using Newtonsoft.Json.Linq;
-    using AsyncIO;
 
     using System;
     using System.Net.Sockets;
@@ -37,7 +36,6 @@ namespace iCSharp.Kernel.Shell
 
         private Dictionary<string, IShellMessageHandler> messageHandlers;
         private Thread threadControl;
-        private AsyncIO.AsyncSocket dummy;
 
         public Shell(ILog logger,
                      string addressShell,
@@ -55,7 +53,6 @@ namespace iCSharp.Kernel.Shell
             this.serverControl = new RouterSocket();
             this.ioPubSocket = new PublisherSocket();
             this.stopEvent = new ManualResetEventSlim();
-            dummy = AsyncSocket.CreateIPv4Tcp();
         }
 
         public void StartRandomPort()
@@ -68,7 +65,6 @@ namespace iCSharp.Kernel.Shell
 
             this.threadControl = new Thread(this.StartServerLoopControl);
             this.threadControl.Start();
-            this.logger.Info($"Shell Started {dummy.GetHashCode()}");
             //ThreadPool.QueueUserWorkItem(new WaitCallback(StartServerLoop));
         }
         public void Start()

@@ -22,6 +22,7 @@ namespace iCSharp.Kernel.ScriptEngine
         public Exception CompileError { get; set; }
 
         public Exception ExecuteError { get; set; }
+        public object ReturnValue {get;set;}
 
         public bool IsError { get => !(CompileError == null && ExecuteError == null); }
     }

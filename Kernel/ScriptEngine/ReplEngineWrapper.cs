@@ -31,6 +31,7 @@ namespace iCSharp.Kernel.ScriptEngine
                 OutputResultWithColorInformation = this.console.GetAllInBuffer(),
                 CompileError = scriptResult.CompileExceptionInfo != null ? scriptResult.CompileExceptionInfo.SourceException : null,
                 ExecuteError = scriptResult.ExecuteExceptionInfo != null ? scriptResult.ExecuteExceptionInfo.SourceException : null,
+                ReturnValue = scriptResult.ReturnValue,
             };
 
             return executionResult;

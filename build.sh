@@ -4,21 +4,25 @@ set -o pipefail
 set -x
 
 # Install dependencies
-mozroots --import --sync --quiet
-mono ./.nuget/NuGet.exe restore ./iCSharp.sln
+#mozroots --import --sync --quiet
 
 # Build scriptcs
-cd ./Engine
+if true; then
+  #mono ./.nuget/NuGet.exe restore ./iCSharp.sln
 
-# If brew is given as parameter, use the brew build-script
-if [ "$1" == "brew" ]
-then
-	./build_brew.sh
-else
-	./build.sh
+  cd ./Engine
+
+  # If brew is given as parameter, use the brew build-script
+  if [ "$1" == "brew" ]
+  then
+    ./build_brew.sh
+  else
+    ./build.sh
+  fi
+
+  cd ../
+
 fi
-
-cd ../
 
 # Build iCSharp
 mkdir -p build/Release/bin
