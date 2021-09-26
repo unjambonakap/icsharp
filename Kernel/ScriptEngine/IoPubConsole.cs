@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using System.Web;
 using Common.Logging;
 using Common.Serializer;
 using iCSharp.Kernel.Helpers;
@@ -88,7 +87,6 @@ namespace iCSharp.Kernel.ScriptEngine
             JObject data = new JObject()
             {
                 {"text/plain", value },
-                {"text/html",  HttpUtility.HtmlEncode(value).Replace("\n", "<br/>")}
             };
 
             DisplayData displayData = new DisplayData()

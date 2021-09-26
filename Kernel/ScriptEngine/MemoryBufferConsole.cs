@@ -1,15 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using ScriptCs.Contracts;
 
 namespace iCSharp.Kernel.ScriptEngine
 {
+    public interface IConsole
+    {
+        void Write(string value);
+
+        void WriteLine();
+
+        void WriteLine(string value);
+
+        string ReadLine(string prompt);
+
+        void Clear();
+
+        void Exit();
+
+        void ResetColor();
+
+        ConsoleColor ForegroundColor { get; set; }
+
+        int Width { get; }
+    }
     public class MemoryBufferConsole : IConsole
     {
         private const ConsoleColor DefaultConsoleColor = ConsoleColor.Black;
 
-        private List<Tuple<string,ConsoleColor>> buffer;
+        private List<Tuple<string, ConsoleColor>> buffer;
 
         private ConsoleColor foregroundColor;
 
@@ -20,7 +38,7 @@ namespace iCSharp.Kernel.ScriptEngine
 
         public void ClearAllInBuffer()
         {
-            this.buffer.Clear();    
+            this.buffer.Clear();
         }
 
         public MemoryBufferConsole()

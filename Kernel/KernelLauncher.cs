@@ -5,34 +5,39 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Common.Logging;
+using Common.Logging.Configuration;
 using iCSharp.Messages;
+using log4net.Appender;
+using log4net.Layout;
 using Newtonsoft.Json;
-using ScriptCs;
-using ScriptCs.Contracts;
 
 namespace iCSharp.Kernel
 {
 
+    public class KernelLauncherConfig
+    {
+        public string KernelConfigJsonWriteDirectory { get; set; }
+
+        public string Name { get; set; }
+
+    }
     public class KernelLauncher : IDisposable
     {
         public static bool Running = false;
 
-        object data;
         IServer _shellServer;
         IServer _hbServer;
         ConnectionInformation _connectionInfo;
-        private string _kernelConfigFile;
-        string name;
         FileStream _fs;
+        private KernelLauncherConfig _config;
 
-        public KernelLauncher(string name, object data)
+        public KernelLauncher(KernelLauncherConfig config)
         {
-            this.data = data;
-            this.name = name;
+            _config = config;
         }
-        public void Create(ExtraParams extraParams = null)
+        public string Create(ExtraParams extraParams = null)
         {
-            ScriptEnvironment.GlobalData = data;
             Running = true;
 
             var connectionInfo = new ConnectionInformation
@@ -42,7 +47,7 @@ namespace iCSharp.Kernel
                 SignatureScheme = "hmac-sha256",
                 Key = Guid.NewGuid().ToString(),
                 Transport = "tcp",
-                Name = name,
+                Name = _config.Name,
             };
 
             extraParams = extraParams ?? GetExtraParams();
@@ -64,40 +69,39 @@ namespace iCSharp.Kernel
             connectionInfo.HBPort = heartBeatServer.PortMapping["hb"];
 
 
-            for (int i = 0; ; ++i)
-            {
-                if (TryWriteConfig(connectionInfo, i)) break;
-            }
+            string configFile = WriteConfig(connectionInfo);
 
             _connectionInfo = connectionInfo;
 
             _shellServer = shellServer;
             _hbServer = heartBeatServer;
+            return configFile;
+
         }
 
-        bool TryWriteConfig(ConnectionInformation connectionInfo, int tryId)
+        string WriteConfig(ConnectionInformation connectionInfo)
         {
-            var path = System.Environment.GetEnvironmentVariable("JUPYTER_KERNEL_DIR");
             var oldName = connectionInfo.Name;
+            string kernelConfigFile = null;
+            int tryId = 0;
             try
             {
 
                 var newName = $"{oldName}-{tryId}";
                 connectionInfo.Name = newName;
-                _kernelConfigFile = Path.Combine(path, $"kernel{connectionInfo.Name}.json");
-                _fs = new FileStream(_kernelConfigFile, FileMode.Create, FileAccess.Write, FileShare.Read);
-                Debug.WriteLine($"Kernel config at {_kernelConfigFile}");
+                kernelConfigFile = Path.Combine(_config.KernelConfigJsonWriteDirectory, $"kernel{connectionInfo.Name}.json");
+                _fs = new FileStream(kernelConfigFile, FileMode.Create, FileAccess.Write, FileShare.Read);
+                Debug.WriteLine($"Kernel config at {kernelConfigFile}");
 
                 byte[] data = new UTF8Encoding(true).GetBytes(JsonConvert.SerializeObject(connectionInfo));
                 _fs.Write(data, 0, data.Length);
                 _fs.Flush();
-                return true;
+                return kernelConfigFile;
             }
             catch (Exception)
             {
                 connectionInfo.Name = oldName;
-                Debug.WriteLine($"Kernel config at {_kernelConfigFile} already exists for tryid={tryId}");
-                return false;
+                throw;
             }
         }
 
@@ -115,8 +119,31 @@ namespace iCSharp.Kernel
             _hbServer.GetWaitEvent().Wait();
         }
 
+        public static void Init()
+        {
 
-        public static ScriptCs.Contracts.ExtraParams GetExtraParams()
+            if (!log4net.LogManager.GetRepository().Configured)
+            {
+                foreach (var x in Assembly.GetExecutingAssembly().GetManifestResourceNames())
+                    Console.WriteLine($"Resource >> {x}");
+                using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("iCSharp.Kernel.App.config"))
+                {
+                    if (stream == null)
+                        throw new Exception("Bad config");
+                    log4net.Config.XmlConfigurator.Configure(stream);
+                }
+                var y = ((log4net.Repository.Hierarchy.Hierarchy)log4net.LogManager.GetRepository());
+                var layout = new PatternLayout("%date{dd MMM yyyy HH:mm:ss,fff} [%thread] -() %message%newline");
+
+                y.Root.AddAppender(new TextWriterAppender { Layout = layout, Writer = Console.Out });
+            }
+
+            var cx = new NameValueCollection();
+            cx["configType"] = "INLINE";
+            LogManager.Adapter = new Common.Logging.Log4Net.Log4NetLoggerFactoryAdapter(cx);
+        }
+
+        public static ExtraParams GetExtraParams()
         {
             var extraRefsAssemblies = AppDomain.CurrentDomain.GetAssemblies()
                 .Where(x => !x.IsDynamic)
@@ -130,8 +157,7 @@ namespace iCSharp.Kernel
             "System.Linq", "System.Reflection", "System.Text", "Newtonsoft.Json", "Newtonsoft.Json.Linq",
             "System.Threading",  "MoreLinq",
             };
-
-            ScriptCs.Contracts.ExtraParams extraParams = new ScriptCs.Contracts.ExtraParams();
+            ExtraParams extraParams = new ExtraParams();
             extraParams.References.AddRange(extraRefs);
             extraParams.DllPaths.Add(curPath);
             extraParams.DllPaths.AddRange(extraRefs.Select(x => Path.GetDirectoryName(x)));

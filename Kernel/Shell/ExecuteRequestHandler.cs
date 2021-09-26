@@ -7,7 +7,6 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using iCSharp.Kernel.ScriptEngine;
-using System.Web;
 using iCSharp.Kernel.Helpers;
 
 namespace iCSharp.Kernel.Shell
@@ -30,6 +29,7 @@ namespace iCSharp.Kernel.Shell
 
         public ExecuteRequestHandler(ILog logger, IReplEngine replEngine, IMessageSender messageSender)
         {
+            this.logger.Info("Execute handler start");
             this.logger = logger;
             this.replEngine = replEngine;
 			this.messageSender = messageSender;
@@ -38,6 +38,7 @@ namespace iCSharp.Kernel.Shell
         public void HandleMessage(Message message, RouterSocket serverSocket, PublisherSocket ioPub)
         {
             this.logger.Debug(string.Format("Message Content {0}", message.Content));
+            this.logger.Info(string.Format("Execute Request received "));
             ExecuteRequest executeRequest = message.Content.ToObject<ExecuteRequest>();
 
             this.logger.Info(string.Format("Execute Request received with code \n{0}", executeRequest.Code));
@@ -65,12 +66,10 @@ namespace iCSharp.Kernel.Shell
                 if (results.OutputResultWithColorInformation.Any())
                 {
                     string codeOutput = this.GetCodeOutput(results);
-                    string codeHtmlOutput = this.GetCodeHtmlOutput(results);
 
                     JObject data = new JObject()
                     {
                         {"text/plain", codeOutput},
-                        {"text/html", codeHtmlOutput}
                     };
 
                     DisplayData displayData = new DisplayData()
@@ -117,17 +116,6 @@ namespace iCSharp.Kernel.Shell
             return sb.ToString();
         }
 
-        private string GetCodeHtmlOutput(ExecutionResult executionResult)
-        {
-            StringBuilder sb = new StringBuilder();
-            foreach (Tuple<string, ConsoleColor> tuple in executionResult.OutputResultWithColorInformation)
-            {
-                string encoded = HttpUtility.HtmlEncode(tuple.Item1);
-                sb.Append(string.Format("<font style=\"color:{0}\">{1}</font>", tuple.Item2.ToString(), encoded));
-            }
-
-            return sb.ToString();
-        }
 
         public void SendDisplayDataMessageToIOPub(Message message, PublisherSocket ioPub, DisplayData data)
         {

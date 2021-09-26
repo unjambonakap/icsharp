@@ -9,7 +9,8 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>iCSharp.Kernel</RootNamespace>
     <AssemblyName>iCSharp.Kernel</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
@@ -33,7 +34,30 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CopyProjectReferencesToPackage</TargetsForTfmSpecificBuildOutput>
+  </PropertyGroup>
+  <Target Name="CopyProjectReferencesToPackage" DependsOnTargets="ResolveReferences">
+    <ItemGroup>
+      <BuildOutputInPackage Include="@(ReferenceCopyLocalPaths->WithMetadataValue('ReferenceSourceTarget', 'ProjectReference'))" />
+    </ItemGroup>
+  </Target>
   <ItemGroup>
+    <Reference Include="ICSharpCode.NRefactory, Version=5.0.0.0, Culture=neutral, PublicKeyToken=d4bfe873e7598c49, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Engine\packages\ICSharpCode.NRefactory.5.5.1\lib\Net40\ICSharpCode.NRefactory.dll</HintPath>
+    </Reference>
+    <Reference Include="ICSharpCode.NRefactory.Cecil">
+      <HintPath>..\Engine\packages\ICSharpCode.NRefactory.5.5.1\lib\Net40\ICSharpCode.NRefactory.Cecil.dll</HintPath>
+    </Reference>
+    <Reference Include="ICSharpCode.NRefactory.CSharp, Version=5.0.0.0, Culture=neutral, PublicKeyToken=d4bfe873e7598c49, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Engine\packages\ICSharpCode.NRefactory.5.5.1\lib\Net40\ICSharpCode.NRefactory.CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="ICSharpCode.NRefactory.Xml, Version=5.0.0.0, Culture=neutral, PublicKeyToken=d4bfe873e7598c49, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Engine\packages\ICSharpCode.NRefactory.5.5.1\lib\Net40\ICSharpCode.NRefactory.Xml.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Web" />
@@ -42,16 +66,44 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="Common.Logging">
-      <HintPath>..\packages\Common.Logging.2.1.2\lib\net40\Common.Logging.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System.ServiceModel" />
     <Reference Include="NetMQ">
-      <HintPath>..\packages\NetMQ.4.0.1.7-pre\lib\net47\NetMQ.dll</HintPath>
+      <HintPath>..\packages\NetMQ.4.0.0.1\lib\net40\NetMQ.dll</HintPath>
     </Reference>
+    <Reference Include="Mono.CSharp, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0738eb9f132ed756, processorArchitecture=MSIL">
+      <HintPath>../Engine/packages/Mono.CSharp.4.0.0.143/lib/4.5/Mono.CSharp.dll</HintPath>
+      <Aliases>MonoCSharp</Aliases>
+    </Reference>
+    <Reference Include="Mono.Cecil">
+      <HintPath>..\Engine\packages\Mono.Cecil.0.9.5.4\lib\net40\Mono.Cecil.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil.Mdb">
+      <HintPath>..\Engine\packages\Mono.Cecil.0.9.5.4\lib\net40\Mono.Cecil.Mdb.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil.Pdb">
+      <HintPath>..\Engine\packages\Mono.Cecil.0.9.5.4\lib\net40\Mono.Cecil.Pdb.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil.Rocks">
+      <HintPath>..\Engine\packages\Mono.Cecil.0.9.5.4\lib\net40\Mono.Cecil.Rocks.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net">
+      <HintPath>../packages/log4net.2.0.3/lib/net40-client/log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="Common.Logging">
+      <HintPath>..\packages\Common.Logging.3.4.1\lib\net40\Common.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="Common.Logging.Core">
+      <HintPath>..\packages\Common.Logging.Core.3.4.1\lib\net40\Common.Logging.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Common.Logging.Log4Net1213">
+      <HintPath>../packages/Common.Logging.Log4Net1213.3.4.1/lib/net40/Common.Logging.Log4Net1213.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+    <ItemGroup>
+    <EmbeddedResource Include="App.config" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants.cs" />
@@ -79,6 +131,19 @@
     <Compile Include="Helpers\ISignatureValidator.cs" />
     <Compile Include="Helpers\IMessageSender.cs" />
     <Compile Include="Helpers\SignatureValidator.cs" />
+    <Compile Include="Segmenter\Lexer\Token.cs" />
+    <Compile Include="Segmenter\Lexer\LexerResult.cs" />
+    <Compile Include="Segmenter\Lexer\ScriptLexer.cs" />
+    <Compile Include="Segmenter\Analyser\MethodResult.cs" />
+    <Compile Include="Segmenter\SegmentResult.cs" />
+    <Compile Include="Segmenter\SegmentType.cs" />
+    <Compile Include="Segmenter\ScriptSegmenter.cs" />
+    <Compile Include="Segmenter\Parser\RegionParser.cs" />
+    <Compile Include="Segmenter\Parser\RegionResult.cs" />
+    <Compile Include="Segmenter\Analyser\Visitors\ClassTypeVisitor.cs" />
+    <Compile Include="Segmenter\Analyser\Visitors\MethodVisitor.cs" />
+    <Compile Include="Segmenter\Analyser\Visitors\MethodVisitorResult.cs" />
+    <Compile Include="Segmenter\Analyser\CodeAnalyzer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -90,30 +155,6 @@
     <ProjectReference Include="..\Common\Common.csproj">
       <Project>{0330B333-D8B9-451E-B3B7-20DAF7A2FCD4}</Project>
       <Name>Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Engine\src\ScriptCs.Contracts\ScriptCs.Contracts.csproj">
-      <Project>{6049E205-8B5F-4080-B023-70600E51FD64}</Project>
-      <Name>ScriptCs.Contracts</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Engine\src\ScriptCs.Core\ScriptCs.Core.csproj">
-      <Project>{E590E710-E159-48E6-A3E6-1A83D3FE732C}</Project>
-      <Name>ScriptCs.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Engine\src\ScriptCs.Engine.Mono\ScriptCs.Engine.Mono.csproj">
-      <Project>{E4ADCFEE-FF3B-4EF5-8298-2B31F407F58B}</Project>
-      <Name>ScriptCs.Engine.Mono</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Engine\src\ScriptCs.Engine.Roslyn\ScriptCs.Engine.Roslyn.csproj">
-      <Project>{E79EC231-E27D-4057-91C9-2D001A3A8C3B}</Project>
-      <Name>ScriptCs.Engine.Roslyn</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Engine\src\ScriptCs.Hosting\ScriptCs.Hosting.csproj">
-      <Project>{9AEF2D95-87FB-4829-B384-34BFE076D531}</Project>
-      <Name>ScriptCs.Hosting</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Engine\src\ScriptCs\ScriptCs.csproj">
-      <Project>{25080671-1A80-4041-B9C7-260578FF4849}</Project>
-      <Name>ScriptCs</Name>
     </ProjectReference>
     <ProjectReference Include="..\Messages\Messages.csproj">
       <Project>{1DC4BCD0-8E6B-4657-AD7C-2E1E01E3EB34}</Project>
@@ -129,11 +170,11 @@
     <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
+    Other similar extension points exist, see Microsoft.Common.targets.
+    <Target Name="BeforeBuild">
+    </Target>
+    <Target Name="AfterBuild">
+    </Target>
   -->
-  <ItemGroup />
-</Project>
+    <ItemGroup />
+  </Project>

@@ -6,11 +6,11 @@ namespace iCSharp.Kernel
     using System.Net.Sockets;
     using System.Reflection;
     using Common.Logging;
-    using Common.Logging.Simple;
     using iCSharp.Kernel.Helpers;
     using iCSharp.Kernel.ScriptEngine;
     using iCSharp.Kernel.Shell;
     using iCSharp.Messages;
+    using log4net.Layout;
     using NetMQ;
 
 
@@ -35,12 +35,10 @@ namespace iCSharp.Kernel
         private Dictionary<string, IShellMessageHandler> _messageHandlerMap;
 
         public KernelCreator(ConnectionInformation connectionInformation,
-            ScriptCs.Contracts.ExtraParams extraParams
+            ExtraParams extraParams
             )
         {
-
-            this._logger = new NoOpLogger();
-            // this._logger = new ConsoleOutLogger("kernel", LogLevel.Info, true, true, false, "yyyy/MM/dd HH:mm:ss:fff");
+            _logger = LogManager.GetLogger(typeof(KernelCreator));
 
             this._connectionInformation = connectionInformation;
             //this._replEngineFactory = new ReplEngineFactory(this._logger, new string[] {"-loglevel", "DEBUG"});

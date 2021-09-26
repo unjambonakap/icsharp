@@ -43,8 +43,17 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="log4net">
+      <HintPath>../packages/log4net.2.0.3/lib/net40-client/log4net.dll</HintPath>
+    </Reference>
     <Reference Include="Common.Logging">
-      <HintPath>..\packages\Common.Logging.2.1.2\lib\net40\Common.Logging.dll</HintPath>
+      <HintPath>..\packages\Common.Logging.3.4.1\lib\net40\Common.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="Common.Logging.Core">
+      <HintPath>..\packages\Common.Logging.Core.3.4.1\lib\net40\Common.Logging.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Common.Logging.Log4Net1213">
+      <HintPath>../packages/Common.Logging.Log4Net1213.3.4.1/lib/net40/Common.Logging.Log4Net1213.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -56,27 +65,10 @@
 
     <Reference Include="System.ServiceModel" />
     <Reference Include="NetMQ">
-      <HintPath>..\packages\NetMQ.4.0.1.7-pre\lib\net47\NetMQ.dll</HintPath>
+      <HintPath>..\packages\NetMQ.4.0.0.1\lib\net40\NetMQ.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.CodeAnalysis, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>../Engine/newlib/Microsoft.CodeAnalysis.Common.1.3.2/lib/net45/Microsoft.CodeAnalysis.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.CodeAnalysis.CSharp, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>../Engine/newlib/Microsoft.CodeAnalysis.CSharp.1.3.2/lib/net45/Microsoft.CodeAnalysis.CSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.CodeAnalysis.Scripting, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>../Engine/newlib/Microsoft.CodeAnalysis.Scripting.Common.1.3.2/lib/dotnet/Microsoft.CodeAnalysis.Scripting.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.CodeAnalysis.Scripting.CSharp, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>../Engine/newlib/Microsoft.CodeAnalysis.CSharp.Scripting.1.3.2/lib/dotnet/Microsoft.CodeAnalysis.CSharp.Scripting.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Reflection.Metadata, Version=1.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>../Engine/newlib/System.Reflection.Metadata.1.3.0/lib/portable-net45+win8/System.Reflection.Metadata.dll</HintPath>
+    <Reference Include="AsyncIO">
+      <HintPath>../packages/AsyncIO.0.1.26.0/lib/net40/AsyncIO.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -90,30 +82,6 @@
     <ProjectReference Include="..\Common\Common.csproj">
       <Project>{0330B333-D8B9-451E-B3B7-20DAF7A2FCD4}</Project>
       <Name>Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Engine\src\ScriptCs.Contracts\ScriptCs.Contracts.csproj">
-      <Project>{6049E205-8B5F-4080-B023-70600E51FD64}</Project>
-      <Name>ScriptCs.Contracts</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Engine\src\ScriptCs.Core\ScriptCs.Core.csproj">
-      <Project>{E590E710-E159-48E6-A3E6-1A83D3FE732C}</Project>
-      <Name>ScriptCs.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Engine\src\ScriptCs.Engine.Mono\ScriptCs.Engine.Mono.csproj">
-      <Project>{E4ADCFEE-FF3B-4EF5-8298-2B31F407F58B}</Project>
-      <Name>ScriptCs.Engine.Mono</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Engine\src\ScriptCs.Engine.Roslyn\ScriptCs.Engine.Roslyn.csproj">
-      <Project>{E79EC231-E27D-4057-91C9-2D001A3A8C3B}</Project>
-      <Name>ScriptCs.Engine.Roslyn</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Engine\src\ScriptCs.Hosting\ScriptCs.Hosting.csproj">
-      <Project>{9AEF2D95-87FB-4829-B384-34BFE076D531}</Project>
-      <Name>ScriptCs.Hosting</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Engine\src\ScriptCs\ScriptCs.csproj">
-      <Project>{25080671-1A80-4041-B9C7-260578FF4849}</Project>
-      <Name>ScriptCs</Name>
     </ProjectReference>
     <ProjectReference Include="..\Messages\Messages.csproj">
       <Project>{1DC4BCD0-8E6B-4657-AD7C-2E1E01E3EB34}</Project>

@@ -119,7 +119,11 @@ namespace iCSharp.Kernel.Shell
                     }
                 }
             }
-            catch (SocketException s) { }
+            catch (SocketException s)
+            {
+
+                this.logger.Error($"SocketException >> {s.ToString()}");
+            }
         }
 
         private Message GetMessage()

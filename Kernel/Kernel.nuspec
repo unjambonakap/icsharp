@@ -14,4 +14,25 @@
     <copyright>Something</copyright>
     <tags>Tag1 Tag2</tags>
   </metadata>
+  <files>
+    <file target="libs\\" src="..\Engine\packages\ICSharpCode.NRefactory.5.5.1\lib\Net40\ICSharpCode.NRefactory.dll" />
+    <file target="libs\\" src="..\Engine\packages\ICSharpCode.NRefactory.5.5.1\lib\Net40\ICSharpCode.NRefactory.Cecil.dll" />
+    <file target="libs\\" src="..\Engine\packages\ICSharpCode.NRefactory.5.5.1\lib\Net40\ICSharpCode.NRefactory.CSharp.dll" />
+    <file target="libs\\" src="..\Engine\packages\ICSharpCode.NRefactory.5.5.1\lib\Net40\ICSharpCode.NRefactory.Xml.dll" />
+    <file target="libs\\" src="..\packages\Common.Logging.3.4.1\lib\net40\Common.Logging.dll" />
+    <file target="libs\\" src="..\packages\Common.Logging.Core.3.4.1\lib\net40\Common.Logging.Core.dll" />
+    <file target="libs\\" src="../packages/Common.Logging.Log4Net1213.3.4.1/lib/net40/Common.Logging.Log4Net1213.dll" />
+    <file target="libs\\" src="../packages/log4net.2.0.3/lib/net40-client/log4net.dll" />
+    <file target="libs\\" src="..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll" />
+    <file target="libs\\" src="..\packages\NetMQ.4.0.0.1\lib\net40\NetMQ.dll" />
+    <file target="libs\\" src="../Engine/packages/Mono.CSharp.4.0.0.143/lib/4.5/Mono.CSharp.dll" />
+    <file target="libs\\" src="..\Engine\packages\Mono.Cecil.0.9.5.4\lib\net40\Mono.Cecil.dll" />
+    <file target="libs\\" src="..\Engine\packages\Mono.Cecil.0.9.5.4\lib\net40\Mono.Cecil.Mdb.dll" />
+    <file target="libs\\" src="..\Engine\packages\Mono.Cecil.0.9.5.4\lib\net40\Mono.Cecil.Pdb.dll" />
+    <file target="libs\\" src="..\Engine\packages\Mono.Cecil.0.9.5.4\lib\net40\Mono.Cecil.Rocks.dll" />
+    <file target="libs\\" src="../packages/AsyncIO.0.1.26.0/lib/net40/AsyncIO.dll" />
+    <file target="libs\\" src="/usr/lib/mono/4.5/System.Xml.Linq.dll" />
+
+
+  </files>
 </package>

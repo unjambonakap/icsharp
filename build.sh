@@ -7,7 +7,7 @@ set -x
 #mozroots --import --sync --quiet
 
 # Build scriptcs
-if true; then
+if false; then
   #mono ./.nuget/NuGet.exe restore ./iCSharp.sln
 
   cd ./Engine
