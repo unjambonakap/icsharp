@@ -17,6 +17,7 @@ namespace iCSharp.Kernel
 {
     public class ExtraParams
     {
+        public object Data {get; set;}
         public List<string> References = new List<string>();
         public List<string> SearchPaths = new List<string>();
         public List<string> DllPaths = new List<string>();

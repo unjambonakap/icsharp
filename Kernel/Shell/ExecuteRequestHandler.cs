@@ -1,16 +1,12 @@
-﻿
-
-
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using iCSharp.Kernel.ScriptEngine;
 using iCSharp.Kernel.Helpers;
 
 namespace iCSharp.Kernel.Shell
 {
+    using System;
     using Common.Logging;
     using Common.Serializer;
     using iCSharp.Messages;
@@ -23,25 +19,23 @@ namespace iCSharp.Kernel.Shell
 
         private readonly IReplEngine replEngine;
 
-		private readonly IMessageSender messageSender;
+        private readonly IMessageSender messageSender;
 
-		private int executionCount = 0;
+        private int executionCount = 0;
 
         public ExecuteRequestHandler(ILog logger, IReplEngine replEngine, IMessageSender messageSender)
         {
-            this.logger.Info("Execute handler start");
             this.logger = logger;
             this.replEngine = replEngine;
-			this.messageSender = messageSender;
+            this.messageSender = messageSender;
         }
 
         public void HandleMessage(Message message, RouterSocket serverSocket, PublisherSocket ioPub)
         {
-            this.logger.Debug(string.Format("Message Content {0}", message.Content));
-            this.logger.Info(string.Format("Execute Request received "));
+            this.logger.Debug(string.Format("Message Content {0}", message?.Content?.ToString()));
             ExecuteRequest executeRequest = message.Content.ToObject<ExecuteRequest>();
 
-            this.logger.Info(string.Format("Execute Request received with code \n{0}", executeRequest.Code));
+            this.logger.Debug(string.Format("Execute Request received with code \n{0}", executeRequest.Code));
 
             // 1: Send Busy status on IOPub
             this.messageSender.SendStatus(message, ioPub, StatusValues.Busy);
@@ -85,13 +79,13 @@ namespace iCSharp.Kernel.Shell
             else
             {
                 var ex = results.CompileError != null ? results.CompileError : results.ExecuteError;
-                dynamic errorContent = new JObject();
-                errorContent.execution_count = this.executionCount;
-                errorContent.ename = ex.GetType().ToString();
-                errorContent.evalue = ex.Message;
+                JObject errorContent = new JObject();
+                errorContent["execution_count"]  = this.executionCount;
+                errorContent["ename"] = ex.GetType().ToString();
+                errorContent["evalue"] = ex.Message;
                 var trace = new JArray(ex.StackTrace.Split('\n'));
                 trace.AddFirst(ex.Message);
-                errorContent.traceback = trace;
+                errorContent["traceback"] = trace;
 
                 // 6: Send error message to IOPub
                 this.SendErrorMessageToIOPub(message, ioPub, errorContent);
@@ -128,15 +122,15 @@ namespace iCSharp.Kernel.Shell
 
             Message outputMessage = MessageBuilder.CreateMessage(MessageTypeValues.DisplayData, content, message.Header);
 
-            this.logger.Info(string.Format("Sending message to IOPub {0}", JsonSerializer.Serialize(outputMessage)));
-			this.messageSender.Send(outputMessage, ioPub);
+            this.logger.Debug(string.Format("Sending message to IOPub {0}", JsonSerializer.Serialize(outputMessage)));
+            this.messageSender.Send(outputMessage, ioPub);
         }
 
         public void SendErrorMessageToIOPub(Message message, PublisherSocket ioPub, JObject errorContent)
         {
             Message executeReplyMessage = MessageBuilder.CreateMessage(MessageTypeValues.Error, errorContent, message.Header);
 
-            this.logger.Info(string.Format("Sending message to IOPub {0}", JsonSerializer.Serialize(executeReplyMessage)));
+            this.logger.Debug(string.Format("Sending message to IOPub {0}", JsonSerializer.Serialize(executeReplyMessage)));
             this.messageSender.Send(executeReplyMessage, ioPub);
         }
 
@@ -150,8 +144,8 @@ namespace iCSharp.Kernel.Shell
 
             Message executeInputMessage = MessageBuilder.CreateMessage(MessageTypeValues.ExecuteInput, content, message.Header);
 
-            this.logger.Info(string.Format("Sending message to IOPub {0}", JsonSerializer.Serialize(executeInputMessage)));
-			this.messageSender.Send(executeInputMessage, ioPub);
+            this.logger.Debug(string.Format("Sending message to IOPub {0}", JsonSerializer.Serialize(executeInputMessage)));
+            this.messageSender.Send(executeInputMessage, ioPub);
         }
 
         public void SendExecuteReplyOkMessage(Message message, RouterSocket shellSocket)
@@ -169,7 +163,7 @@ namespace iCSharp.Kernel.Shell
             // Necessary since the shell socket is a ROUTER socket
             executeReplyMessage.Identifiers = message.Identifiers;
 
-            this.logger.Info(string.Format("Sending message to Shell {0}", JsonSerializer.Serialize(executeReplyMessage)));
+            this.logger.Debug(string.Format("Sending message to Shell {0}", JsonSerializer.Serialize(executeReplyMessage)));
             this.messageSender.Send(executeReplyMessage, shellSocket);
         }
 
@@ -183,7 +177,7 @@ namespace iCSharp.Kernel.Shell
             // Necessary since the shell socket is a ROUTER socket
             executeReplyMessage.Identifiers = message.Identifiers;
 
-            this.logger.Info(string.Format("Sending message to Shell {0}", JsonSerializer.Serialize(executeReplyMessage)));
+            this.logger.Debug(string.Format("Sending message to Shell {0}", JsonSerializer.Serialize(executeReplyMessage)));
             this.messageSender.Send(executeReplyMessage, shellSocket);
         }
     }

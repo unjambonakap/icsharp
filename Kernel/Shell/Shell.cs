@@ -74,7 +74,7 @@ namespace iCSharp.Kernel.Shell
             this.thread = new Thread(this.StartServerLoop);
             this.thread.Start();
 
-            this.logger.Info("Shell Started");
+            this.logger.Debug("Shell Started");
             //ThreadPool.QueueUserWorkItem(new WaitCallback(StartServerLoop));
         }
 
@@ -95,7 +95,6 @@ namespace iCSharp.Kernel.Shell
             this.logger.Info(string.Format("Binded the Shell server to address {0}", this.addressShell));
 
             this.logger.Info(string.Format("Binded the  IOPub to address {0}", this.addressIOPub));
-
             try
             {
                 while (!this.stopEvent.Wait(0))
@@ -103,14 +102,14 @@ namespace iCSharp.Kernel.Shell
                     Message message = this.GetMessage();
                     if (message == null) return;
 
-                    this.logger.Info(JsonSerializer.Serialize(message));
+                    this.logger.Debug(JsonSerializer.Serialize(message));
 
                     IShellMessageHandler handler;
                     if (this.messageHandlers.TryGetValue(message.Header.MessageType, out handler))
                     {
-                        this.logger.Info(string.Format("Sending message to handler {0}", message.Header.MessageType));
+                        this.logger.Debug(string.Format("Sending message to handler {0}", message.Header.MessageType));
                         handler.HandleMessage(message, this.server, this.ioPubSocket);
-                        this.logger.Info("Message handling complete");
+                        this.logger.Debug("Message handling complete");
                     }
                     else
                     {
@@ -123,6 +122,18 @@ namespace iCSharp.Kernel.Shell
             {
 
                 this.logger.Error($"SocketException >> {s.ToString()}");
+                this.logger.Error($"Stacktrace: {s.StackTrace}");
+            }
+            catch (TypeLoadException te)
+            {
+                this.logger.Error($"type load >> {te.TypeName}xx{te.Message}");
+
+                this.logger.Error($"Stacktrace: {te.StackTrace}");
+            }
+            catch (Exception e)
+            {
+                this.logger.Error($"other exception  >> {e.ToString()}");
+                this.logger.Error($"Stacktrace: {e.StackTrace}");
             }
         }
 
@@ -149,29 +160,29 @@ namespace iCSharp.Kernel.Shell
 
             // Getting Hmac
             message.Signature = this.server.ReceiveFrameString();
-            this.logger.Info(message.Signature);
+            this.logger.Debug(message.Signature);
 
             // Getting Header
             string header = this.server.ReceiveFrameString();
-            this.logger.Info(header);
+            this.logger.Debug(header);
 
             message.Header = JsonSerializer.Deserialize<Header>(header);
 
             // Getting parent header
             string parentHeader = this.server.ReceiveFrameString();
-            this.logger.Info(parentHeader);
+            this.logger.Debug(parentHeader);
 
             message.ParentHeader = JsonSerializer.Deserialize<Header>(parentHeader);
 
             // Getting metadata
             string metadata = this.server.ReceiveFrameString();
-            this.logger.Info(metadata);
+            this.logger.Debug(metadata);
 
             message.MetaData = JObject.Parse(metadata);
 
             // Getting content
             string content = this.server.ReceiveFrameString();
-            this.logger.Info(content);
+            this.logger.Debug(content);
 
             message.Content = JObject.Parse(content);
 

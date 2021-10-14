@@ -29,7 +29,6 @@ namespace iCSharp.Kernel
         IServer _shellServer;
         IServer _hbServer;
         ConnectionInformation _connectionInfo;
-        FileStream _fs;
         private KernelLauncherConfig _config;
 
         public KernelLauncher(KernelLauncherConfig config)
@@ -78,7 +77,6 @@ namespace iCSharp.Kernel
             return configFile;
 
         }
-
         string WriteConfig(ConnectionInformation connectionInfo)
         {
             var oldName = connectionInfo.Name;
@@ -90,12 +88,14 @@ namespace iCSharp.Kernel
                 var newName = $"{oldName}-{tryId}";
                 connectionInfo.Name = newName;
                 kernelConfigFile = Path.Combine(_config.KernelConfigJsonWriteDirectory, $"kernel{connectionInfo.Name}.json");
-                _fs = new FileStream(kernelConfigFile, FileMode.Create, FileAccess.Write, FileShare.Read);
-                Debug.WriteLine($"Kernel config at {kernelConfigFile}");
+                using (var fs = new FileStream(kernelConfigFile, FileMode.Create, FileAccess.Write, FileShare.Read))
+                {
+                    Debug.WriteLine($"Kernel config at {kernelConfigFile}");
 
-                byte[] data = new UTF8Encoding(true).GetBytes(JsonConvert.SerializeObject(connectionInfo));
-                _fs.Write(data, 0, data.Length);
-                _fs.Flush();
+                    byte[] data = new UTF8Encoding(true).GetBytes(JsonConvert.SerializeObject(connectionInfo));
+                    fs.Write(data, 0, data.Length);
+                    fs.Flush();
+                }
                 return kernelConfigFile;
             }
             catch (Exception)
@@ -109,7 +109,6 @@ namespace iCSharp.Kernel
         {
             _shellServer.Dispose();
             _hbServer.Dispose();
-            _fs.Dispose();
         }
 
 

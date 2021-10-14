@@ -103,7 +103,7 @@ namespace iCSharp.Kernel.ScriptEngine
 
             Message outputMessage = MessageBuilder.CreateMessage(MessageTypeValues.DisplayData, content, _message.Header);
 
-            this._logger.Info(string.Format("Sending message to IOPub {0}", JsonSerializer.Serialize(outputMessage)));
+            this._logger.Debug(string.Format("Sending message to IOPub {0}", JsonSerializer.Serialize(outputMessage)));
             this._messageSender.Send(outputMessage, _ioPub);
         }
     }

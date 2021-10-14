@@ -10,6 +10,7 @@ using MonoCSharp::Mono.CSharp;
 using ScriptCs.Engine.Mono.Segmenter;
 using Common.Logging;
 using Common.Logging.Simple;
+using System.IO;
 
 namespace iCSharp.Kernel.ScriptEngine
 {
@@ -32,8 +33,9 @@ namespace iCSharp.Kernel.ScriptEngine
         public static ScriptEnvironment _env { get; set; }
         public AssemblyReferences References { get; set; }
         public CompilerContext Context { get; set; }
-        public bool Debug { get; set; } = false;
+        public bool Debug { get; set; } = true;
         public Evaluator Evaluator { get; internal set; }
+        public ExtraParams ExtraParams {get;set;}
 
         public void AddSearchPath(string path)
         {
@@ -58,10 +60,15 @@ namespace iCSharp.Kernel.ScriptEngine
 
         public AssemblyReferences References { get; set; } = new AssemblyReferences();
         public ScriptEnvironment Env = new ScriptEnvironment();
+        public MemoryStream ms = new MemoryStream();
+        public StreamWriter writer;
+        public StreamReader reader;
 
         public MonoScriptEngine()
         {
             Env.References = References;
+            writer = new StreamWriter(ms);
+            reader = new StreamReader(ms);
         }
 
         public ICollection<string> GetLocalVariables()
@@ -85,6 +92,7 @@ namespace iCSharp.Kernel.ScriptEngine
                 _log = new ConsoleOutLogger("kernel", LogLevel.Debug, true, true, false, "yyyy/MM/dd HH:mm:ss:fff");
             else
                 _log = new ConsoleOutLogger("kernel", LogLevel.Info, true, true, false, "yyyy/MM/dd HH:mm:ss:fff");
+                var lastPos = ms.Position;
 
             if (Evaluator == null)
             {
@@ -92,7 +100,7 @@ namespace iCSharp.Kernel.ScriptEngine
                 _log.Debug("Creating session");
                 var context = new CompilerContext(
                     new CompilerSettings { AssemblyReferences = References.Paths.Concat(extra_params.References).ToList() },
-                    new ConsoleReportPrinter());
+                    new StreamReportPrinter(writer));
                 // new ConsoleReportPrinter());
 
                 Evaluator = new Evaluator(context);
@@ -102,6 +110,7 @@ namespace iCSharp.Kernel.ScriptEngine
                 Evaluator.InteractiveBaseClass = typeof(ScriptEnvironment);
                 Env.Context = context;
                 Env.Evaluator = Evaluator;
+                Env.ExtraParams = extra_params;
                 ScriptEnvironment._env = Env;
 
                 ImportNamespaces(allNamespaces, Evaluator);
@@ -123,9 +132,16 @@ namespace iCSharp.Kernel.ScriptEngine
 
                 ImportNamespaces(newNamespaces, Evaluator);
             }
-            _log.Debug("Starting execution");
+            _log.Debug($"Starting execution {code}");
             var result = Execute(code, Evaluator);
             _log.Debug("Finished execution");
+            writer.Flush();
+            var pos = ms.Position;
+            ms.Position = lastPos;
+
+            var tmp = reader.ReadToEnd();
+            Console.Write(tmp);
+            ms.Position = pos;
 
             return result;
         }
@@ -137,20 +153,25 @@ namespace iCSharp.Kernel.ScriptEngine
             try
             {
                 object scriptResult = null;
-                var segmenter = new ScriptSegmenter();
-                foreach (var segment in segmenter.Segment(code))
+                bool resultSet;
+                if (false)
                 {
-                    _log.Debug($"Executing code={segment.Code} ");
-                    if (true)
+                    var segmenter = new ScriptSegmenter();
+                    foreach (var segment in segmenter.Segment(code))
                     {
-                        bool resultSet;
-                        string s = session.Evaluate(segment.Code, out scriptResult, out resultSet);
-                    }
-                    else
-                    {
-                        var res = session.Run(segment.Code);
+                        _log.Debug($"Executing code={segment.Code} ");
+                        if (true)
+                        {
+                            string s = session.Evaluate(segment.Code, out scriptResult, out resultSet);
+                        }
+                        else
+                        {
+                            var res = session.Run(segment.Code);
+                        }
                     }
                 }
+                else
+                    session.Evaluate(code, out scriptResult, out resultSet);
 
 
                 return new ScriptResult(returnValue: scriptResult);
