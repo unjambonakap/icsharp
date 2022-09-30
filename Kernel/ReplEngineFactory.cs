@@ -25,6 +25,7 @@ namespace iCSharp.Kernel
         public List<Assembly> ExtraAssemblies = new List<Assembly>();
 
         public List<string> WhitelistedNamespaces = new List<string>();
+        public Action<Action> PushAction = x=> x();
     }
 
     public class ScriptResult

@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 using Common.Logging;
 using Common.Logging.Configuration;
 using iCSharp.Messages;
@@ -47,6 +48,8 @@ namespace iCSharp.Kernel
                 Key = Guid.NewGuid().ToString(),
                 Transport = "tcp",
                 Name = _config.Name,
+                Date = DateTime.UtcNow.ToString("o"),
+                RunId= _config.Name,
             };
 
             extraParams = extraParams ?? GetExtraParams();
@@ -87,7 +90,7 @@ namespace iCSharp.Kernel
 
                 var newName = $"{oldName}-{tryId}";
                 connectionInfo.Name = newName;
-                kernelConfigFile = Path.Combine(_config.KernelConfigJsonWriteDirectory, $"kernel{connectionInfo.Name}.json");
+                kernelConfigFile = Path.Combine(_config.KernelConfigJsonWriteDirectory, $"kernel-{connectionInfo.Name}.json");
                 using (var fs = new FileStream(kernelConfigFile, FileMode.Create, FileAccess.Write, FileShare.Read))
                 {
                     Debug.WriteLine($"Kernel config at {kernelConfigFile}");

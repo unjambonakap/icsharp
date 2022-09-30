@@ -27,6 +27,7 @@ fi
 # Build iCSharp
 mkdir -p build/Release/bin
 xbuild ./iCSharp.sln /property:Configuration=Debug /nologo /verbosity:normal
+#xbuild ./iCSharp.sln /property:Configuration=Release /nologo /verbosity:normal
 
 # Copy files safely
 for line in $(find ./*/bin/Release/*); do 

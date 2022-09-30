@@ -35,5 +35,11 @@ namespace iCSharp.Messages
 
         [JsonProperty("name")]
         public string Name { get; set; }
+
+        [JsonProperty("date")]
+        public string Date { get; set; }
+
+        [JsonProperty("runid")]
+        public string RunId { get; set; }
     }
 }

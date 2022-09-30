@@ -133,7 +133,8 @@ namespace iCSharp.Kernel.ScriptEngine
                 ImportNamespaces(newNamespaces, Evaluator);
             }
             _log.Debug($"Starting execution {code}");
-            var result = Execute(code, Evaluator);
+            ScriptResult result = null;
+            extra_params.PushAction(() => {result = Execute(code, Evaluator);});
             _log.Debug("Finished execution");
             writer.Flush();
             var pos = ms.Position;
